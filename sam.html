@@ -229,7 +229,8 @@
     let timerInterval = null;
 
     // Tempo máximo de espera do servidor (ms)
-    const TIMEOUT_MS = 25000;
+    // O DNS do DuckDNS pode levar até 10s, mais processamento n8n de 15-20s
+    const TIMEOUT_MS = 35000;
     // Tempo de silêncio antes de enviar (ms)
     const SILENCE_MS = 1200;
 
@@ -519,20 +520,21 @@
 
         // Mensagens específicas por tipo de erro
         if (err.name === 'AbortError') {
-          setStatus("O servidor não respondeu. O Sam pode estar offline.", 'error');
+          setStatus("Servidor demorou demais. Toque na orb para tentar de novo.", 'error');
         } else if (err.name === 'TypeError' && err.message.includes('fetch')) {
-          setStatus("Não foi possível conectar ao servidor. Verifique sua internet.", 'error');
-        } else if (err.message.includes('DNS') || err.message.includes('resolve') || err.message.includes('Failed to fetch')) {
-          setStatus("Servidor do Sam parece estar offline. Tente mais tarde.", 'error');
+          setStatus("Sem conexão com o servidor. Verifique sua internet.", 'error');
+        } else if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
+          setStatus("Servidor offline ou conexão instável. Toque para tentar de novo.", 'error');
         } else {
-          setStatus("Erro ao falar com a IA. Tente novamente.", 'error');
+          setStatus("Erro inesperado. Toque na orb para tentar de novo.", 'error');
         }
 
+        // Mostra hint de retry
         setTimeout(() => {
           orb.classList.remove('error-state');
-          setStatus("Clique para falar");
-          showHint(2000);
-        }, 4000);
+          setStatus("Toque na orb para falar");
+          showHint(500);
+        }, 5000);
       }
     }
 

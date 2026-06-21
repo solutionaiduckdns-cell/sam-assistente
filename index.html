@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sam — Assistente Pessoal IA</title>
+  <meta name="description" content="Sam é um assistente pessoal com inteligência artificial, voz natural e integração com Gmail, Google Calendar, Drive e busca na internet.">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --border: #1e1e2a;
+      --text: #e0e0e8;
+      --text-muted: #7878a0;
+      --cyan: #00e5ff;
+      --purple: #b388ff;
+      --gold: #ffd54f;
+      --gradient-orb: radial-gradient(circle at 30% 30%, #00e5ff, #004d4d);
+      --gradient-accent: linear-gradient(135deg, #00e5ff, #b388ff);
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* === NAV === */
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(10, 10, 15, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+    }
+
+    nav .logo {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    nav .logo span {
+      background: var(--gradient-accent);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    nav .links {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+
+    nav .links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.2s;
+    }
+
+    nav .links a:hover {
+      color: var(--cyan);
+    }
+
+    nav .links .btn {
+      background: var(--gradient-accent);
+      color: #000;
+      font-weight: 600;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 13px;
+      -webkit-text-fill-color: #000;
+    }
+
+    nav .links .btn:hover {
+      opacity: 0.9;
+    }
+
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 4px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px;
+    }
+
+    .menu-toggle span {
+      width: 22px;
+      height: 2px;
+      background: var(--text);
+      border-radius: 2px;
+      transition: 0.3s;
+    }
+
+    /* === HERO === */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 100px 24px 60px;
+      text-align: center;
+      position: relative;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(0, 229, 255, 0.04) 0%, transparent 70%);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    /* Orb decorativa (não interativa, só visual) */
+    .hero-orb {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: var(--gradient-orb);
+      box-shadow: 0 0 60px rgba(0, 229, 255, 0.3);
+      animation: hero-pulse 3s ease-in-out infinite;
+      margin-bottom: 32px;
+      position: relative;
+    }
+
+    .hero-orb::after {
+      content: '';
+      position: absolute;
+      top: -12px;
+      left: -12px;
+      width: 164px;
+      height: 164px;
+      border-radius: 50%;
+      border: 1px solid rgba(0, 229, 255, 0.15);
+      animation: hero-ring 3s ease-in-out infinite;
+    }
+
+    @keyframes hero-pulse {
+      0%, 100% { box-shadow: 0 0 40px rgba(0, 229, 255, 0.2); transform: scale(1); }
+      50% { box-shadow: 0 0 80px rgba(0, 229, 255, 0.4); transform: scale(1.04); }
+    }
+
+    @keyframes hero-ring {
+      0%, 100% { transform: scale(1); opacity: 0.5; }
+      50% { transform: scale(1.15); opacity: 1; }
+    }
+
+    .hero h1 {
+      font-size: clamp(40px, 8vw, 72px);
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+
+    .hero h1 span {
+      background: var(--gradient-accent);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: clamp(16px, 2.5vw, 20px);
+      color: var(--text-muted);
+      max-width: 600px;
+      margin-bottom: 40px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn-primary {
+      background: var(--gradient-accent);
+      color: #000;
+      font-weight: 600;
+      padding: 14px 36px;
+      border-radius: 30px;
+      text-decoration: none;
+      font-size: 15px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0, 229, 255, 0.3);
+    }
+
+    .btn-secondary {
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-weight: 500;
+      padding: 14px 36px;
+      border-radius: 30px;
+      text-decoration: none;
+      font-size: 15px;
+      transition: border-color 0.2s;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--cyan);
+    }
+
+    .hero-tech {
+      margin-top: 48px;
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .hero-tech span {
+      background: var(--surface);
+      padding: 6px 16px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+    }
+
+    /* === SECTIONS === */
+    section {
+      padding: 80px 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    section .label {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: 12px;
+    }
+
+    section h2 {
+      font-size: clamp(28px, 4vw, 40px);
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    section h2 + p {
+      color: var(--text-muted);
+      max-width: 600px;
+      margin-bottom: 48px;
+      font-size: 16px;
+    }
+
+    /* === CAPABILITIES === */
+    .capabilities-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .cap-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .cap-card:hover {
+      border-color: var(--cyan);
+      transform: translateY(-4px);
+    }
+
+    .cap-card .icon {
+      font-size: 32px;
+      margin-bottom: 16px;
+    }
+
+    .cap-card h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .cap-card p {
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .cap-card .tag {
+      display: inline-block;
+      margin-top: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 10px;
+      background: rgba(0, 229, 255, 0.1);
+      color: var(--cyan);
+    }
+
+    /* === TECH STACK === */
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .tech-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      transition: border-color 0.2s;
+    }
+
+    .tech-item:hover {
+      border-color: var(--purple);
+    }
+
+    .tech-item .icon {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+
+    .tech-item h4 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .tech-item p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* === FLOW === */
+    .flow-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding: 32px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+    }
+
+    .flow-step {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 20px;
+      font-size: 13px;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    .flow-step .emoji {
+      display: block;
+      font-size: 22px;
+      margin-bottom: 4px;
+    }
+
+    .flow-arrow {
+      color: var(--text-muted);
+      font-size: 18px;
+    }
+
+    /* === CTA === */
+    .cta-section {
+      text-align: center;
+      padding: 100px 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    .cta-section h2 {
+      margin-bottom: 12px;
+    }
+
+    .cta-section p {
+      color: var(--text-muted);
+      max-width: 500px;
+      margin: 0 auto 32px;
+    }
+
+    /* === FOOTER === */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      max-width: 1100px;
+      margin: 0 auto;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    footer .links {
+      display: flex;
+      gap: 20px;
+    }
+
+    footer .links a {
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+
+    footer .links a:hover {
+      color: var(--cyan);
+    }
+
+    /* === RESPONSIVE === */
+    @media (max-width: 768px) {
+      nav .links {
+        display: none;
+        position: fixed;
+        top: 60px;
+        left: 0;
+        right: 0;
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        flex-direction: column;
+        padding: 20px 24px;
+        gap: 16px;
+        align-items: stretch;
+        text-align: center;
+      }
+
+      nav .links.open {
+        display: flex;
+      }
+
+      nav .links .btn {
+        text-align: center;
+      }
+
+      .menu-toggle {
+        display: flex;
+      }
+
+      .flow-diagram {
+        flex-direction: column;
+      }
+
+      .flow-arrow {
+        transform: rotate(90deg);
+      }
+    }
+
+    /* === DARK SCROLLBAR === */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="logo"><span>✦</span> Sam</div>
+    <button class="menu-toggle" id="menuToggle" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="links" id="navLinks">
+      <a href="#sobre">Sobre</a>
+      <a href="#capacidades">Capacidades</a>
+      <a href="#tecnologia">Tecnologia</a>
+      <a href="#fluxo">Como funciona</a>
+      <a href="sam.html" class="btn">▶ Testar Agora</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-orb"></div>
+    <h1>Conheça o <span>Sam</span></h1>
+    <p>Um assistente pessoal com inteligência artificial, voz natural e integração com suas ferramentas do dia a dia — construído com n8n e GPT-4o.</p>
+    <div class="hero-buttons">
+      <a href="sam.html" class="btn-primary">▶ Testar o Sam</a>
+      <a href="#capacidades" class="btn-secondary">Ver capacidades</a>
+    </div>
+    <div class="hero-tech">
+      <span>🧠 GPT-4o</span>
+      <span>⚡ n8n</span>
+      <span>🔊 Voz Natural</span>
+      <span>📱 Mobile</span>
+      <span>🔗 GitHub Pages</span>
+    </div>
+  </section>
+
+  <!-- SOBRE -->
+  <section id="sobre">
+    <span class="label">Sobre</span>
+    <h2>O que é o Sam?</h2>
+    <p>Sam é um assistente pessoal com IA que você controla por voz. Ele gerencia seu e-mail, agenda, arquivos, faz pesquisas na internet e responde perguntas — tudo com uma interface inspirada no JARVIS do Homem de Ferro.</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;margin-top:32px;">
+      <div class="cap-card">
+        <div class="icon">🎯</div>
+        <h3>Projeto real, não demo</h3>
+        <p>Construído com n8n, GPT-4o e ferramentas reais — Gmail, Google Calendar, Google Drive, Tavily e SerpAPI. Tudo integrado num workflow funcional.</p>
+      </div>
+      <div class="cap-card">
+        <div class="icon">📱</div>
+        <h3>Funciona no celular</h3>
+        <p>Interface responsiva com Web Audio API que funciona no iOS e Android sem blockers de autoplay. Toque, fale e ouça a resposta.</p>
+      </div>
+      <div class="cap-card">
+        <div class="icon">🧩</div>
+        <h3>Extensível por design</h3>
+        <p>O n8n permite adicionar novas ferramentas em minutos — Google Slides, Sheets, consultas a bancos de dados, web scraping, webhooks e mais.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CAPACIDADES -->
+  <section id="capacidades">
+    <span class="label">Capacidades</span>
+    <h2>O que o Sam faz</h2>
+    <p>Comandos de voz integrados com ferramentas reais — não é só um chatbot.</p>
+
+    <div class="capabilities-grid">
+      <div class="cap-card">
+        <div class="icon">📧</div>
+        <h3>Gmail</h3>
+        <p>Lê, responde e gerencia e-mails automaticamente. Basta falar "tem e-mail novo?" ou "responde o último e-mail da Ana".</p>
+        <span class="tag">Ferramenta ativa</span>
+      </div>
+      <div class="cap-card">
+        <div class="icon">📅</div>
+        <h3>Google Calendar</h3>
+        <p>Consulta compromissos, cria eventos e gerencia a agenda. "O que tenho amanhã?" ou "cria um evento às 14h".</p>
+        <span class="tag">Ferramenta ativa</span>
+      </div>
+      <div class="cap-card">
+        <div class="icon">📁</div>
+        <h3>Google Drive</h3>
+        <p>Busca arquivos e pastas no Drive pessoal. "Encontra aquela planilha de orçamento".</p>
+        <span class="tag">Ferramenta ativa</span>
+      </div>
+      <div class="cap-card">
+        <div class="icon">🌐</div>
+        <h3>Busca na Internet</h3>
+        <p>Pesquisa em tempo real usando Tavily e SerpAPI. Clima, notícias, preços, resultados de jogos — dados ao vivo.</p>
+        <span class="tag">Ferramenta ativa</span>
+      </div>
+      <div class="cap-card">
+        <div class="icon">🧠</div>
+        <h3>Conversa Inteligente</h3>
+        <p>GPT-4o com memória de 15 turnos. O Sam lembra do contexto da conversa e responde de forma natural e personalizada.</p>
+        <span class="tag">Modelo GPT-4o</span>
+      </div>
+      <div class="cap-card">
+        <div class="icon">🔊</div>
+        <h3>Voz Natural</h3>
+        <p>OpenAI TTS com voz "Nova", velocidade natural. A resposta chega em áudio em vez de texto — como o JARVIS.</p>
+        <span class="tag">OpenAI TTS</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FLUXO -->
+  <section id="fluxo">
+    <span class="label">Arquitetura</span>
+    <h2>Como funciona</h2>
+    <p>Da sua voz até a resposta em áudio em segundos.</p>
+
+    <div class="flow-diagram">
+      <div class="flow-step"><span class="emoji">👆</span>Toque na orb</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step"><span class="emoji">🗣️</span>Fale com o Sam</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step"><span class="emoji">🌐</span>Webhook n8n</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step"><span class="emoji">🧠</span>GPT-4o + Ferramentas</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step"><span class="emoji">🔊</span>OpenAI TTS</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step"><span class="emoji">🎧</span>Você ouve</div>
+    </div>
+  </section>
+
+  <!-- TECNOLOGIA -->
+  <section id="tecnologia">
+    <span class="label">Stack</span>
+    <h2>Tecnologia por trás</h2>
+    <p>Ferramentas e serviços que fazem o Sam funcionar.</p>
+
+    <div class="tech-grid">
+      <div class="tech-item">
+        <div class="icon">🧠</div>
+        <h4>GPT-4o</h4>
+        <p>Modelo de linguagem da OpenAI</p>
+      </div>
+      <div class="tech-item">
+        <div class="icon">⚡</div>
+        <h4>n8n</h4>
+        <p>Automação e orquestração</p>
+      </div>
+      <div class="tech-item">
+        <div class="icon">🔊</div>
+        <h4>OpenAI TTS</h4>
+        <p>Síntese de voz natural</p>
+      </div>
+      <div class="tech-item">
+        <div class="icon">📧</div>
+        <h4>Gmail API</h4>
+        <p>Leitura e envio de e-mails</p>
+      </div>
+      <div class="tech-item">
+        <div class="icon">📅</div>
+        <h4>Google Calendar</h4>
+        <p>Gestão de eventos</p>
+      </div>
+      <div class="tech-item">
+        <div class="icon">📁</div>
+        <h4>Google Drive</h4>
+        <p>Arquivos e documentos</p>
+      </div>
+      <div class="tech-item">
+        <div class="icon">🔍</div>
+        <h4>Tavily + SerpAPI</h4>
+        <p>Busca em tempo real</p>
+      </div>
+      <div class="tech-item">
+        <div class="icon">🌐</div>
+        <h4>GitHub Pages</h4>
+        <p>Hospedagem do frontend</p>
+      </div>
+      <div class="tech-item">
+        <div class="icon">🎨</div>
+        <h4>Web Speech API</h4>
+        <p>Reconhecimento de voz</p>
+      </div>
+      <div class="tech-item">
+        <div class="icon">🎵</div>
+        <h4>Web Audio API</h4>
+        <p>Reprodução de áudio</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <h2>Quer testar o Sam?</h2>
+    <p>Clique no botão abaixo e comece a falar. Funciona no PC e no celular — sem instalação, sem cadastro.</p>
+    <a href="sam.html" class="btn-primary">▶ Testar o Sam Agora</a>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div>✦ Sam — Assistente Pessoal IA</div>
+    <div class="links">
+      <a href="sam.html">Testar</a>
+      <a href="https://github.com/solutionaiduckdns-cell/sam-assistente" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </footer>
+
+  <script>
+    // Mobile menu toggle
+    const toggle = document.getElementById('menuToggle');
+    const navLinks = document.getElementById('navLinks');
+
+    toggle.addEventListener('click', () => {
+      navLinks.classList.toggle('open');
+    });
+
+    // Close menu on link click
+    navLinks.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        navLinks.classList.remove('open');
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,12 +1,311 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head><meta charset="UTF-8"><title>Sam — Assistente Pessoal IA</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>body{background:#0a0a0f;color:#e0e0e8;font-family:system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;margin:0;padding:24px;text-align:center} p{color:#7878a0;max-width:500px;line-height:1.6}.badge{background:#1e1e2a;padding:6px 14px;border-radius:20px;font-size:13px;color:#ffd54f;margin-bottom:24px}</style>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sam — Assistente Pessoal Inteligente</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        :root {
+            --bg: #0a0a0f;
+            --surface: #12121a;
+            --surface2: #1a1a24;
+            --border: #2a2a3a;
+            --text: #e8e8f0;
+            --text2: #8888a0;
+            --accent: #6c5ce7;
+            --accent2: #a29bfe;
+            --gradient: linear-gradient(135deg, #6c5ce7, #fd79a8, #e17055);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Background glow */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 20%, rgba(108,92,231,0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 80%, rgba(253,121,168,0.05) 0%, transparent 50%);
+            z-index: -1;
+        }
+
+        /* Nav */
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-logo {
+            font-size: 1.3rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .nav-logo span { background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+        .nav-links a { color: var(--text2); text-decoration: none; font-size: 0.9rem; transition: color 0.3s; }
+        .nav-links a:hover { color: var(--text); }
+
+        /* Hero */
+        .hero {
+            max-width: 900px;
+            margin: 4rem auto 2rem;
+            padding: 0 2rem;
+            text-align: center;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            background: rgba(108,92,231,0.15);
+            border: 1px solid rgba(108,92,231,0.3);
+            border-radius: 100px;
+            font-size: 0.8rem;
+            color: var(--accent2);
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 1.5rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text2);
+            max-width: 650px;
+            margin: 0 auto 2rem;
+        }
+
+        /* Stats / Features Grid */
+        .features {
+            max-width: 1100px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .feature-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: border-color 0.3s, transform 0.3s;
+        }
+        .feature-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+        .feature-icon { font-size: 1.8rem; margin-bottom: 0.8rem; }
+        .feature-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .feature-card p { font-size: 0.85rem; color: var(--text2); }
+
+        /* Stack */
+        .stack {
+            max-width: 900px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+            text-align: center;
+        }
+
+        .stack h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+        }
+
+        .stack-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.8rem;
+        }
+
+        .stack-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.6rem 1.2rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text2);
+            transition: border-color 0.3s, color 0.3s;
+        }
+        .stack-item:hover { border-color: var(--accent); color: var(--text); }
+
+        /* Flow */
+        .flow {
+            max-width: 900px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+            text-align: center;
+        }
+
+        .flow h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+        }
+
+        .flow-steps {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .flow-step {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            min-width: 130px;
+        }
+        .flow-step .step-icon { font-size: 1.5rem; margin-bottom: 0.3rem; }
+        .flow-step .step-label { font-size: 0.75rem; color: var(--text2); }
+        .flow-arrow { font-size: 1.5rem; color: var(--accent); }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text2);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        footer a { color: var(--accent2); text-decoration: none; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.2rem; }
+            .hero p { font-size: 1rem; }
+            .flow-steps { flex-direction: column; }
+            .flow-arrow { transform: rotate(90deg); }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
 <body>
-  <div class="badge">🔒 Projeto Pessoal</div>
-  <h1>✦ Sam</h1>
-  <p>Assistente pessoal com IA conectado a dados privados.<br>O acesso é restrito ao criador do projeto.</p>
-  <p style="font-size:13px;margin-top:32px;color:#555">Para demonstrações, entre em contato com o autor.</p>
+    <nav>
+        <div class="nav-logo">✦ <span>sam</span></div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-badge">🧠 Assistente Pessoal com IA</div>
+        <h1>Seu JARVIS <br>pessoal com n8n + GPT-4o</h1>
+        <p>
+            Sam é um assistente de voz inteligente que lê e-mails, gerencia sua agenda,
+            consulta ofertas em tempo real e responde perguntas — tudo por comando de voz.
+        </p>
+    </section>
+
+    <section class="features">
+        <div class="feature-card">
+            <div class="feature-icon">🎤</div>
+            <h3>Comando de Voz</h3>
+            <p>Fale naturalmente e o Sam responde em voz. Suporta Web Audio API para funcionar no celular.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📧</div>
+            <h3>Gmail & Agenda</h3>
+            <p>Leia e responda e-mails, consulte compromissos e gerencie sua rotina por voz.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">💡</div>
+            <h3>Busca na Internet</h3>
+            <p>Notícias, clima, curiosidades — o Sam busca informação atualizada automaticamente.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🏷️</div>
+            <h3>Ofertas em Tempo Real</h3>
+            <p>Consulte as melhores promoções do pool viral: Amazon, Mercado Livre e Shopee.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🔧</div>
+            <h3>100% n8n</h3>
+            <p>Automação visual com nós HTTP, AI Agent, ferramentas Google e TTS — tudo no n8n.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🌐</div>
+            <h3>Frontend Moderno</h3>
+            <p>Interface leve em HTML/CSS/JS com API de áudio do navegador. Funciona em qualquer dispositivo.</p>
+        </div>
+    </section>
+
+    <section class="stack">
+        <h2>🛠 Stack</h2>
+        <div class="stack-grid">
+            <span class="stack-item">n8n</span>
+            <span class="stack-item">GPT-4o</span>
+            <span class="stack-item">OpenAI TTS</span>
+            <span class="stack-item">Gmail API</span>
+            <span class="stack-item">Google Calendar</span>
+            <span class="stack-item">Google Drive</span>
+            <span class="stack-item">Web Audio API</span>
+            <span class="stack-item">GitHub Pages</span>
+        </div>
+    </section>
+
+    <section class="flow">
+        <h2>⚡ Fluxo</h2>
+        <div class="flow-steps">
+            <div class="flow-step">
+                <div class="step-icon">🎤</div>
+                <div class="step-label">Grava Áudio</div>
+            </div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">
+                <div class="step-icon">🔊</div>
+                <div class="step-label">Transcreve (Whisper)</div>
+            </div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">
+                <div class="step-icon">🧠</div>
+                <div class="step-label">GPT-4o Processa</div>
+            </div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">
+                <div class="step-icon">🔧</div>
+                <div class="step-label">Ferramentas (Gmail, etc)</div>
+            </div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">
+                <div class="step-icon">🗣️</div>
+                <div class="step-label">Responde em Voz</div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>🔒 Projeto pessoal — acesso restrito ao criador.</p>
+        <p style="margin-top: 0.5rem;">Feito com ❤️ usando <a href="https://n8n.io" target="_blank">n8n</a> + <a href="https://openai.com" target="_blank">OpenAI</a></p>
+    </footer>
 </body>
 </html>

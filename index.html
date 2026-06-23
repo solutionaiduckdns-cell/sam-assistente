@@ -1,311 +1,578 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sam — Assistente Pessoal Inteligente</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sam — Assistente Inteligente</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
 
-        :root {
-            --bg: #0a0a0f;
-            --surface: #12121a;
-            --surface2: #1a1a24;
-            --border: #2a2a3a;
-            --text: #e8e8f0;
-            --text2: #8888a0;
-            --accent: #6c5ce7;
-            --accent2: #a29bfe;
-            --gradient: linear-gradient(135deg, #6c5ce7, #fd79a8, #e17055);
-        }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a2e;
+    --accent: #00d4ff;
+    --accent2: #7c3aed;
+    --accent3: #f472b6;
+    --text: #e2e8f0;
+    --text-muted: #64748b;
+    --glow: 0 0 20px rgba(0, 212, 255, 0.3), 0 0 60px rgba(0, 212, 255, 0.1);
+    --radius: 16px;
+  }
 
-        body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.6;
-            min-height: 100vh;
-        }
+  body {
+    font-family: 'Space Grotesk', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
 
-        /* Background glow */
-        body::before {
-            content: '';
-            position: fixed;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle at 30% 20%, rgba(108,92,231,0.08) 0%, transparent 50%),
-                        radial-gradient(circle at 70% 80%, rgba(253,121,168,0.05) 0%, transparent 50%);
-            z-index: -1;
-        }
+  /* ── Canvas 3D Particles ── */
+  #particle-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    z-index: 0;
+    pointer-events: none;
+  }
 
-        /* Nav */
-        nav {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 1rem 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-            border-bottom: 1px solid var(--border);
-        }
+  /* ── Grid Background ── */
+  .grid-bg {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    z-index: 0;
+    background-image:
+      linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 60% 50% at 50% 50%, black 30%, transparent 70%);
+    -webkit-mask-image: radial-gradient(ellipse 60% 50% at 50% 50%, black 30%, transparent 70%);
+  }
 
-        .nav-logo {
-            font-size: 1.3rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .nav-logo span { background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .nav-links { display: flex; gap: 1.5rem; align-items: center; }
-        .nav-links a { color: var(--text2); text-decoration: none; font-size: 0.9rem; transition: color 0.3s; }
-        .nav-links a:hover { color: var(--text); }
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }
 
-        /* Hero */
-        .hero {
-            max-width: 900px;
-            margin: 4rem auto 2rem;
-            padding: 0 2rem;
-            text-align: center;
-        }
+  /* ── Hero ── */
+  .hero {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+  }
 
-        .hero-badge {
-            display: inline-block;
-            padding: 0.4rem 1rem;
-            background: rgba(108,92,231,0.15);
-            border: 1px solid rgba(108,92,231,0.3);
-            border-radius: 100px;
-            font-size: 0.8rem;
-            color: var(--accent2);
-            font-weight: 500;
-            margin-bottom: 1.5rem;
-        }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1.2rem;
+    background: rgba(0, 212, 255, 0.08);
+    border: 1px solid rgba(0, 212, 255, 0.2);
+    border-radius: 100px;
+    font-size: 0.8rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+    animation: fadeInDown 0.8s ease;
+  }
+  .hero-badge .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #22c55e;
+    animation: pulse 2s ease-in-out infinite;
+  }
 
-        .hero h1 {
-            font-size: 3.5rem;
-            font-weight: 800;
-            line-height: 1.15;
-            margin-bottom: 1.5rem;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+  .hero h1 {
+    font-size: clamp(2.5rem, 8vw, 6rem);
+    font-weight: 700;
+    line-height: 1.05;
+    margin-bottom: 1.5rem;
+    animation: fadeInUp 0.8s ease 0.2s both;
+  }
+  .hero h1 .gradient {
+    background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero h1 .outline {
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--text);
+  }
 
-        .hero p {
-            font-size: 1.2rem;
-            color: var(--text2);
-            max-width: 650px;
-            margin: 0 auto 2rem;
-        }
+  .hero p {
+    font-size: clamp(1rem, 2vw, 1.3rem);
+    color: var(--text-muted);
+    max-width: 600px;
+    line-height: 1.7;
+    margin-bottom: 2.5rem;
+    animation: fadeInUp 0.8s ease 0.4s both;
+  }
 
-        /* Stats / Features Grid */
-        .features {
-            max-width: 1100px;
-            margin: 3rem auto;
-            padding: 0 2rem;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1rem;
-        }
+  .hero-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    animation: fadeInUp 0.8s ease 0.6s both;
+  }
 
-        .feature-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.5rem;
-            transition: border-color 0.3s, transform 0.3s;
-        }
-        .feature-card:hover { border-color: var(--accent); transform: translateY(-2px); }
-        .feature-icon { font-size: 1.8rem; margin-bottom: 0.8rem; }
-        .feature-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; }
-        .feature-card p { font-size: 0.85rem; color: var(--text2); }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    border-radius: 100px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    box-shadow: var(--glow);
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 30px rgba(0, 212, 255, 0.5), 0 0 80px rgba(0, 212, 255, 0.2);
+  }
+  .btn-secondary {
+    background: rgba(255,255,255,0.05);
+    color: var(--text);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .btn-secondary:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+  .btn-whatsapp {
+    background: #25d366;
+    color: #fff;
+  }
+  .btn-whatsapp:hover {
+    background: #20bd5a;
+    transform: translateY(-2px);
+    box-shadow: 0 0 30px rgba(37, 211, 102, 0.4);
+  }
 
-        /* Stack */
-        .stack {
-            max-width: 900px;
-            margin: 4rem auto;
-            padding: 0 2rem;
-            text-align: center;
-        }
+  /* ── Terminal Glitch ── */
+  .terminal-box {
+    margin-top: 3rem;
+    padding: 1.2rem 1.5rem;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(0, 212, 255, 0.15);
+    border-radius: var(--radius);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--accent);
+    max-width: 500px;
+    width: 100%;
+    text-align: left;
+    animation: fadeInUp 0.8s ease 0.8s both;
+    position: relative;
+    overflow: hidden;
+  }
+  .terminal-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    animation: scanLine 3s linear infinite;
+  }
+  .terminal-box .line {
+    display: flex;
+    gap: 0.5rem;
+    opacity: 0;
+    animation: typeIn 0.5s ease forwards;
+  }
+  .terminal-box .line:nth-child(1) { animation-delay: 1s; }
+  .terminal-box .line:nth-child(2) { animation-delay: 1.8s; }
+  .terminal-box .line:nth-child(3) { animation-delay: 2.6s; }
+  .terminal-box .prompt { color: var(--text-muted); }
+  .terminal-box .cursor {
+    display: inline-block;
+    width: 8px;
+    height: 1em;
+    background: var(--accent);
+    animation: blink 1s step-end infinite;
+    vertical-align: text-bottom;
+    margin-left: 2px;
+  }
 
-        .stack h2 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 2rem;
-        }
+  /* ── Features ── */
+  .features {
+    position: relative;
+    z-index: 1;
+    padding: 6rem 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .features h2 {
+    text-align: center;
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .features .subtitle {
+    text-align: center;
+    color: var(--text-muted);
+    margin-bottom: 3rem;
+  }
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+  .feature-card {
+    padding: 2rem;
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: var(--radius);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+  .feature-card:hover::before { transform: scaleX(1); }
+  .feature-card:hover {
+    border-color: rgba(0, 212, 255, 0.2);
+    transform: translateY(-4px);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  }
+  .feature-card .icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  .feature-card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+  .feature-card p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
 
-        .stack-grid {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 0.8rem;
-        }
+  /* ── Contact ── */
+  .contact {
+    position: relative;
+    z-index: 1;
+    padding: 4rem 2rem 6rem;
+    text-align: center;
+  }
+  .contact h2 {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    margin-bottom: 1rem;
+  }
+  .contact p {
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+  }
+  .contact-card {
+    display: inline-flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem 2.5rem;
+    background: var(--surface);
+    border: 1px solid rgba(37, 211, 102, 0.2);
+    border-radius: var(--radius);
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: var(--text);
+  }
+  .contact-card:hover {
+    border-color: #25d366;
+    box-shadow: 0 0 30px rgba(37, 211, 102, 0.15);
+    transform: translateY(-2px);
+  }
+  .contact-card .wa-icon {
+    font-size: 2.5rem;
+  }
+  .contact-card .wa-info {
+    text-align: left;
+  }
+  .contact-card .wa-info .label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .contact-card .wa-info .number {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #25d366;
+  }
 
-        .stack-item {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 0.6rem 1.2rem;
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: var(--text2);
-            transition: border-color 0.3s, color 0.3s;
-        }
-        .stack-item:hover { border-color: var(--accent); color: var(--text); }
+  /* ── Footer ── */
+  footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    border-top: 1px solid rgba(255,255,255,0.03);
+  }
 
-        /* Flow */
-        .flow {
-            max-width: 900px;
-            margin: 4rem auto;
-            padding: 0 2rem;
-            text-align: center;
-        }
+  /* ── Animations ── */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+  @keyframes scanLine {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+  @keyframes typeIn {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+  }
 
-        .flow h2 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 2rem;
-        }
+  @media (max-width: 600px) {
+    .hero-actions { flex-direction: column; align-items: center; }
+    .btn { width: 100%; justify-content: center; }
+    .features-grid { grid-template-columns: 1fr; }
+    .contact-card { flex-direction: column; text-align: center; }
+    .contact-card .wa-info { text-align: center; }
+  }
 
-        .flow-steps {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        .flow-step {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1rem 1.5rem;
-            min-width: 130px;
-        }
-        .flow-step .step-icon { font-size: 1.5rem; margin-bottom: 0.3rem; }
-        .flow-step .step-label { font-size: 0.75rem; color: var(--text2); }
-        .flow-arrow { font-size: 1.5rem; color: var(--accent); }
-
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 3rem 2rem;
-            color: var(--text2);
-            font-size: 0.85rem;
-            border-top: 1px solid var(--border);
-            max-width: 900px;
-            margin: 0 auto;
-        }
-        footer a { color: var(--accent2); text-decoration: none; }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .hero h1 { font-size: 2.2rem; }
-            .hero p { font-size: 1rem; }
-            .flow-steps { flex-direction: column; }
-            .flow-arrow { transform: rotate(90deg); }
-            .nav-links { display: none; }
-        }
-    </style>
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; }
+    #particle-canvas { display: none; }
+  }
+</style>
 </head>
 <body>
-    <nav>
-        <div class="nav-logo">✦ <span>sam</span></div>
-    </nav>
 
-    <section class="hero">
-        <div class="hero-badge">🧠 Assistente Pessoal com IA</div>
-        <h1>Seu JARVIS <br>pessoal com n8n + GPT-4o</h1>
-        <p>
-            Sam é um assistente de voz inteligente que lê e-mails, gerencia sua agenda,
-            consulta ofertas em tempo real e responde perguntas — tudo por comando de voz.
-        </p>
-    </section>
+<canvas id="particle-canvas"></canvas>
+<div class="grid-bg"></div>
 
-    <section class="features">
-        <div class="feature-card">
-            <div class="feature-icon">🎤</div>
-            <h3>Comando de Voz</h3>
-            <p>Fale naturalmente e o Sam responde em voz. Suporta Web Audio API para funcionar no celular.</p>
-        </div>
-        <div class="feature-card">
-            <div class="feature-icon">📧</div>
-            <h3>Gmail & Agenda</h3>
-            <p>Leia e responda e-mails, consulte compromissos e gerencie sua rotina por voz.</p>
-        </div>
-        <div class="feature-card">
-            <div class="feature-icon">💡</div>
-            <h3>Busca na Internet</h3>
-            <p>Notícias, clima, curiosidades — o Sam busca informação atualizada automaticamente.</p>
-        </div>
-        <div class="feature-card">
-            <div class="feature-icon">🏷️</div>
-            <h3>Ofertas em Tempo Real</h3>
-            <p>Consulte as melhores promoções do pool viral: Amazon, Mercado Livre e Shopee.</p>
-        </div>
-        <div class="feature-card">
-            <div class="feature-icon">🔧</div>
-            <h3>100% n8n</h3>
-            <p>Automação visual com nós HTTP, AI Agent, ferramentas Google e TTS — tudo no n8n.</p>
-        </div>
-        <div class="feature-card">
-            <div class="feature-icon">🌐</div>
-            <h3>Frontend Moderno</h3>
-            <p>Interface leve em HTML/CSS/JS com API de áudio do navegador. Funciona em qualquer dispositivo.</p>
-        </div>
-    </section>
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">
+    <span class="dot"></span>
+    Online · Inteligência Artificial
+  </div>
 
-    <section class="stack">
-        <h2>🛠 Stack</h2>
-        <div class="stack-grid">
-            <span class="stack-item">n8n</span>
-            <span class="stack-item">GPT-4o</span>
-            <span class="stack-item">OpenAI TTS</span>
-            <span class="stack-item">Gmail API</span>
-            <span class="stack-item">Google Calendar</span>
-            <span class="stack-item">Google Drive</span>
-            <span class="stack-item">Web Audio API</span>
-            <span class="stack-item">GitHub Pages</span>
-        </div>
-    </section>
+  <h1>
+    <span class="outline">Olá, eu sou</span><br>
+    <span class="gradient">Sam</span>
+  </h1>
 
-    <section class="flow">
-        <h2>⚡ Fluxo</h2>
-        <div class="flow-steps">
-            <div class="flow-step">
-                <div class="step-icon">🎤</div>
-                <div class="step-label">Grava Áudio</div>
-            </div>
-            <span class="flow-arrow">→</span>
-            <div class="flow-step">
-                <div class="step-icon">🔊</div>
-                <div class="step-label">Transcreve (Whisper)</div>
-            </div>
-            <span class="flow-arrow">→</span>
-            <div class="flow-step">
-                <div class="step-icon">🧠</div>
-                <div class="step-label">GPT-4o Processa</div>
-            </div>
-            <span class="flow-arrow">→</span>
-            <div class="flow-step">
-                <div class="step-icon">🔧</div>
-                <div class="step-label">Ferramentas (Gmail, etc)</div>
-            </div>
-            <span class="flow-arrow">→</span>
-            <div class="flow-step">
-                <div class="step-icon">🗣️</div>
-                <div class="step-label">Responde em Voz</div>
-            </div>
-        </div>
-    </section>
+  <p>
+    Seu assistente inteligente powered by IA. Consulto ofertas, respondo dúvidas 
+    e ajudo você a encontrar as melhores oportunidades sem sair do WhatsApp.
+  </p>
 
-    <footer>
-        <p>🔒 Projeto pessoal — acesso restrito ao criador.</p>
-        <p style="margin-top: 0.5rem;">Feito com ❤️ usando <a href="https://n8n.io" target="_blank">n8n</a> + <a href="https://openai.com" target="_blank">OpenAI</a></p>
-    </footer>
+  <div class="hero-actions">
+    <a href="https://wa.me/558599792167" target="_blank" class="btn btn-whatsapp">
+      💬 Falar com Sam no WhatsApp
+    </a>
+    <a href="https://solutionaiduckdns-cell.github.io/sam-assistente/sam.html" target="_blank" class="btn btn-secondary">
+      🖥️ Versão Web
+    </a>
+  </div>
+
+  <div class="terminal-box">
+    <div class="line"><span class="prompt">$</span> sam<span class="cursor"></span></div>
+    <div class="line"><span class="prompt">></span> Inicializando módulos neurais...</div>
+    <div class="line"><span class="prompt">></span> Sistema pronto. Aguardando comando.</div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+  <h2>🔮 Capacidades</h2>
+  <p class="subtitle">O que o Sam pode fazer por você</p>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="icon">🔍</div>
+      <h3>Consultar Ofertas</h3>
+      <p>Busca em tempo real as melhores ofertas de Amazon, Mercado Livre e Shopee.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🤖</div>
+      <h3>IA Conversacional</h3>
+      <p>Respondo perguntas, tiro dúvidas e converso de forma natural como um assistente real.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">⚡</div>
+      <h3>Respostas Rápidas</h3>
+      <p>Processamento em tempo real com inteligência artificial de última geração.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">📱</div>
+      <h3>WhatsApp Nativo</h3>
+      <p>Funciona diretamente no seu WhatsApp, sem precisar instalar nada.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🎯</div>
+      <h3>Recomendações</h3>
+      <p>Indico produtos e ofertas baseados no que você procura.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🔒</div>
+      <h3>24 Horas</h3>
+      <p>Disponível a qualquer momento, pronto para ajudar quando você precisar.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact" id="contato">
+  <h2>📞 Entre em Contato</h2>
+  <p>Chame o Sam diretamente no WhatsApp</p>
+  <a href="https://wa.me/558599792167" target="_blank" class="contact-card">
+    <div class="wa-icon">💬</div>
+    <div class="wa-info">
+      <div class="label">WhatsApp</div>
+      <div class="number">(85) 99792-167</div>
+      <div style="color:var(--text-muted);font-size:0.85rem;margin-top:2px;">Toque para conversar com Sam</div>
+    </div>
+  </a>
+</section>
+
+<footer>
+  <p>Sam — Assistente Inteligente &bull; 2026</p>
+</footer>
+
+<script>
+// ── 3D Particle System ──
+const canvas = document.getElementById('particle-canvas');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [], mouse = { x: 0, y: 0 };
+const PARTICLE_COUNT = 120;
+const CONNECTION_DIST = 150;
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resize);
+resize();
+
+document.addEventListener('mousemove', e => {
+  mouse.x = e.clientX;
+  mouse.y = e.clientY;
+});
+
+class Particle {
+  constructor() {
+    this.reset();
+  }
+  reset() {
+    this.x = Math.random() * W;
+    this.y = Math.random() * H;
+    this.z = Math.random() * 200;
+    this.vx = (Math.random() - 0.5) * 0.5;
+    this.vy = (Math.random() - 0.5) * 0.5;
+    this.vz = (Math.random() - 0.5) * 0.3;
+    this.size = Math.random() * 2 + 1;
+    this.color = `hsla(${190 + Math.random() * 40}, 100%, ${60 + Math.random() * 30}%, ${0.4 + Math.random() * 0.4})`;
+    this.pulse = Math.random() * Math.PI * 2;
+    this.pulseSpeed = 0.01 + Math.random() * 0.02;
+  }
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+    this.z += this.vz;
+    this.pulse += this.pulseSpeed;
+    
+    // Mouse interaction
+    const dx = mouse.x - this.x;
+    const dy = mouse.y - this.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if (dist < 200) {
+      const force = (200 - dist) / 200 * 0.3;
+      this.x -= dx * force * 0.01;
+      this.y -= dy * force * 0.01;
+    }
+    
+    if (this.x < 0 || this.x > W || this.y < 0 || this.y > H) this.reset();
+  }
+  draw() {
+    const scale = 1 + Math.sin(this.pulse) * 0.3;
+    const s = this.size * scale;
+    const opacity = 0.3 + Math.sin(this.pulse) * 0.3;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, s, 0, Math.PI * 2);
+    ctx.fillStyle = this.color.replace(/[\d.]+(?=\))/, opacity);
+    ctx.fill();
+  }
+}
+
+for (let i = 0; i < PARTICLE_COUNT; i++) particles.push(new Particle());
+
+function drawConnections() {
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const dx = particles[i].x - particles[j].x;
+      const dy = particles[i].y - particles[j].y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < CONNECTION_DIST) {
+        const opacity = (1 - dist / CONNECTION_DIST) * 0.15;
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.strokeStyle = `rgba(0, 212, 255, ${opacity})`;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+    }
+  }
+}
+
+function animate() {
+  ctx.clearRect(0, 0, W, H);
+  drawConnections();
+  particles.forEach(p => { p.update(); p.draw(); });
+  requestAnimationFrame(animate);
+}
+animate();
+</script>
 </body>
 </html>

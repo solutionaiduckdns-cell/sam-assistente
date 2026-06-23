@@ -474,24 +474,30 @@ for (let i = 0; i < STARS; i++) {
   });
 }
 
-// Ships
-const SHIP_COUNT = 4;
+// Ships — BIG & VISIBLE
+const SHIP_COUNT = 5;
 const ships = [];
 
+const SHIP_COLORS = [
+  { body: '#c89b6b', glow: '#ffd700', cockpit: '#4fc3f7', name: 'gold' },
+  { body: '#4fc3f7', glow: '#80deea', cockpit: '#ff8a65', name: 'cyan' },
+  { body: '#ff6b9d', glow: '#ff4081', cockpit: '#c89b6b', name: 'pink' },
+  { body: '#b388ff', glow: '#7c4dff', cockpit: '#4fc3f7', name: 'purple' },
+  { body: '#69f0ae', glow: '#00e676', cockpit: '#ffab40', name: 'green' }
+];
+
 function createShip() {
-  const fromTop = Math.random() > 0.5;
+  const c = SHIP_COLORS[Math.floor(Math.random() * SHIP_COLORS.length)];
   return {
-    x: -100,
-    y: fromTop ? Math.random() * H * 0.3 : H * 0.6 + Math.random() * H * 0.3,
-    speed: 1.2 + Math.random() * 1.5,
-    size: 12 + Math.random() * 16,
-    yOffset: (Math.random() - 0.5) * 2,
-    waveAmp: 3 + Math.random() * 5,
-    waveFreq: 0.01 + Math.random() * 0.015,
+    x: -200,
+    y: 80 + Math.random() * (H - 200),
+    speed: 2.5 + Math.random() * 2,
+    size: 40 + Math.random() * 40,
+    waveAmp: 8 + Math.random() * 12,
+    waveFreq: 0.008 + Math.random() * 0.01,
     phase: Math.random() * Math.PI * 2,
-    opacity: 0.4 + Math.random() * 0.3,
-    color: Math.random() > 0.5 ? '#c89b6b' : '#7c8a9a',
-    trail: [] // store trail points
+    color: c,
+    trail: []
   };
 }
 
@@ -504,51 +510,92 @@ for (let i = 0; i < SHIP_COUNT; i++) {
 function drawShip(ship) {
   const s = ship.size;
   const x = ship.x;
-  const y = ship.y + Math.sin(ship.x * ship.waveFreq + ship.phase) * ship.waveAmp + ship.yOffset;
+  const y = ship.y + Math.sin(x * ship.waveFreq + ship.phase) * ship.waveAmp;
+  const c = ship.color;
   
-  // Trail
-  if (ship.trail.length > 0) {
-    for (let i = 0; i < ship.trail.length; i++) {
-      const alpha = (i / ship.trail.length) * ship.opacity * 0.3;
-      ctx.beginPath();
-      ctx.arc(ship.trail[i].x, ship.trail[i].y, 1.5 * (i / ship.trail.length), 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(200, 155, 107, ${alpha})`;
-      ctx.fill();
-    }
-  }
-  
-  // Engine glow
-  const grad = ctx.createRadialGradient(x - s * 0.4, y, 0, x - s * 0.4, y, s * 0.6);
-  grad.addColorStop(0, `rgba(200, 155, 107, ${ship.opacity * 0.8})`);
-  grad.addColorStop(0.3, `rgba(200, 155, 107, ${ship.opacity * 0.3})`);
-  grad.addColorStop(1, 'rgba(200, 155, 107, 0)');
+  // ── Engine flame ──
+  const flameLen = s * (0.5 + Math.sin(x * 0.05) * 0.2);
+  const grad = ctx.createRadialGradient(x - s * 0.3, y, 0, x - s * 0.3, y, flameLen);
+  grad.addColorStop(0, c.glow);
+  grad.addColorStop(0.3, c.glow + '80');
+  grad.addColorStop(0.7, c.glow + '30');
+  grad.addColorStop(1, 'transparent');
   ctx.fillStyle = grad;
   ctx.beginPath();
-  ctx.arc(x - s * 0.4, y, s * 0.6, 0, Math.PI * 2);
+  ctx.ellipse(x - s * 0.4, y, flameLen, s * 0.25, 0, 0, Math.PI * 2);
   ctx.fill();
   
-  // Ship body - simple triangle design
+  // ── Trail particles ──
+  const trailX = x - s * 0.3 - (x - ship.trail[0]?.x || 0) * 0.1;
+  for (let i = 0; i < ship.trail.length; i++) {
+    const t = ship.trail[i];
+    const alpha = (i / ship.trail.length) * 0.6;
+    const radius = (i / ship.trail.length) * s * 0.12;
+    ctx.beginPath();
+    ctx.arc(t.x, t.y, radius, 0, Math.PI * 2);
+    ctx.fillStyle = c.glow + Math.floor(alpha * 255).toString(16).padStart(2, '0');
+    ctx.fill();
+  }
+  
+  // ── Ship body ──
   ctx.save();
   ctx.translate(x, y);
+  const rot = Math.sin(x * ship.waveFreq + ship.phase) * 0.03 - 0.02; // slight rotation
+  ctx.rotate(rot);
   
-  // Hull
+  // Main hull
   ctx.beginPath();
-  ctx.moveTo(s * 0.6, 0); // nose
-  ctx.lineTo(-s * 0.4, -s * 0.3); // top-left
-  ctx.lineTo(-s * 0.5, 0); // back center
-  ctx.lineTo(-s * 0.4, s * 0.3); // bottom-left
+  ctx.moveTo(s * 0.6, 0);           // nose tip
+  ctx.lineTo(s * 0.2, -s * 0.15);   // upper cockpit
+  ctx.lineTo(-s * 0.3, -s * 0.45);  // top-left wing
+  ctx.lineTo(-s * 0.4, -s * 0.15);  // top engine
+  ctx.lineTo(-s * 0.35, 0);         // back center
+  ctx.lineTo(-s * 0.4, s * 0.15);   // bottom engine
+  ctx.lineTo(-s * 0.3, s * 0.45);   // bottom-left wing
+  ctx.lineTo(s * 0.2, s * 0.15);    // lower cockpit
   ctx.closePath();
   
-  ctx.fillStyle = `rgba(255, 255, 255, ${ship.opacity * 0.15})`;
-  ctx.strokeStyle = `rgba(200, 155, 107, ${ship.opacity * 0.6})`;
+  ctx.fillStyle = c.body + '30';
+  ctx.strokeStyle = c.body;
+  ctx.lineWidth = 2;
+  ctx.fill();
+  ctx.stroke();
+  
+  // Wing highlights
+  ctx.beginPath();
+  ctx.moveTo(s * 0.1, -s * 0.08);
+  ctx.lineTo(-s * 0.2, -s * 0.3);
+  ctx.strokeStyle = c.body + '60';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  
+  ctx.beginPath();
+  ctx.moveTo(s * 0.1, s * 0.08);
+  ctx.lineTo(-s * 0.2, s * 0.3);
+  ctx.stroke();
+  
+  // Cockpit dome
+  ctx.beginPath();
+  ctx.ellipse(s * 0.1, 0, s * 0.12, s * 0.08, 0, 0, Math.PI * 2);
+  ctx.fillStyle = c.cockpit + '50';
+  ctx.strokeStyle = c.cockpit;
   ctx.lineWidth = 1.2;
   ctx.fill();
   ctx.stroke();
   
-  // Cockpit glow
+  // Cockpit inner glow
   ctx.beginPath();
-  ctx.arc(s * 0.2, 0, s * 0.08, 0, Math.PI * 2);
-  ctx.fillStyle = `rgba(200, 155, 107, ${ship.opacity * 0.5})`;
+  ctx.arc(s * 0.1, 0, s * 0.04, 0, Math.PI * 2);
+  ctx.fillStyle = c.cockpit + '80';
+  ctx.fill();
+  
+  // Nose cone accent
+  ctx.beginPath();
+  ctx.moveTo(s * 0.5, 0);
+  ctx.lineTo(s * 0.25, -s * 0.04);
+  ctx.lineTo(s * 0.25, s * 0.04);
+  ctx.closePath();
+  ctx.fillStyle = c.body + '50';
   ctx.fill();
   
   ctx.restore();
@@ -593,17 +640,16 @@ function animate() {
     ship.x += ship.speed;
     
     // Reset when off screen
-    if (ship.x > W + 100) {
+    if (ship.x > W + 200) {
       const fresh = createShip();
-      ship.x = -100 - Math.random() * 300;
-      ship.y = fresh.y;
+      ship.x = -200 - Math.random() * 500;
+      ship.y = 80 + Math.random() * (H - 200);
       ship.speed = fresh.speed;
-      ship.size = fresh.size;
+      ship.size = 40 + Math.random() * 40;
       ship.waveAmp = fresh.waveAmp;
       ship.waveFreq = fresh.waveFreq;
       ship.phase = fresh.phase;
-      ship.opacity = fresh.opacity;
-      ship.color = fresh.color;
+      ship.color = SHIP_COLORS[Math.floor(Math.random() * SHIP_COLORS.length)];
       ship.trail = [];
     }
   }

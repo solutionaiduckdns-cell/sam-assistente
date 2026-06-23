@@ -5,20 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sam — Assistente Inteligente</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
 
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
   :root {
     --bg: #0a0a0f;
     --surface: #12121a;
-    --surface2: #1a1a2e;
     --accent: #00d4ff;
     --accent2: #7c3aed;
     --accent3: #f472b6;
     --text: #e2e8f0;
     --text-muted: #64748b;
-    --glow: 0 0 20px rgba(0, 212, 255, 0.3), 0 0 60px rgba(0, 212, 255, 0.1);
     --radius: 16px;
   }
 
@@ -75,12 +73,14 @@
     background: rgba(0, 212, 255, 0.08);
     border: 1px solid rgba(0, 212, 255, 0.2);
     border-radius: 100px;
-    font-size: 0.8rem;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.7rem;
     color: var(--accent);
-    letter-spacing: 0.1em;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
     animation: fadeInDown 0.8s ease;
+    backdrop-filter: blur(4px);
   }
   .hero-badge .dot {
     width: 8px; height: 8px;
@@ -88,32 +88,113 @@
     background: #22c55e;
     animation: pulse 2s ease-in-out infinite;
   }
+  .hero-badge .divider {
+    width: 1px; height: 14px;
+    background: rgba(0,212,255,0.3);
+  }
 
+  /* ── FUTURISTIC TYPOGRAPHY ── */
   .hero h1 {
-    font-size: clamp(2.5rem, 8vw, 6rem);
-    font-weight: 700;
-    line-height: 1.05;
     margin-bottom: 1.5rem;
     animation: fadeInUp 0.8s ease 0.2s both;
   }
-  .hero h1 .outline {
+
+  /* Line 1: Massive outline */
+  .hero .line-outline {
+    display: block;
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(2.8rem, 12vw, 9rem);
+    font-weight: 900;
+    line-height: 1;
     color: transparent;
     -webkit-text-stroke: 1.5px var(--text);
+    text-stroke: 1.5px var(--text);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.3;
+    animation: fadeInUp 0.8s ease 0.2s both;
+    position: relative;
   }
-  .hero h1 .gradient {
+
+  /* Line 2: Gradient with massive glow */
+  .hero .line-gradient {
+    display: block;
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(1.8rem, 7vw, 5rem);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
     background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    animation: glowPulse 3s ease-in-out infinite;
+    position: relative;
+  }
+  .hero .line-gradient::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0; left: 0;
+    z-index: -1;
+    background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: blur(20px);
+    opacity: 0.6;
+    animation: glowPulse 3s ease-in-out infinite 0.5s;
+  }
+
+  /* Line 3: Brand name — massive, glowing, animated */
+  .hero .line-brand {
+    display: block;
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(3.5rem, 14vw, 11rem);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, var(--accent3), var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 40px rgba(0, 212, 255, 0.4)) drop-shadow(0 0 80px rgba(124, 58, 237, 0.2));
+    animation: brandFloat 4s ease-in-out infinite, fadeInUp 0.8s ease 0.2s both;
+    position: relative;
+  }
+  .hero .line-brand::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0; left: 0;
+    z-index: -1;
+    background: linear-gradient(135deg, var(--accent3), var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: blur(30px);
+    opacity: 0.7;
+    animation: brandFloat 4s ease-in-out infinite 0.5s;
+  }
+
+  /* Decorative separator line */
+  .hero-divider {
+    width: 120px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent);
+    margin: 0 auto 1.5rem;
+    border-radius: 1px;
+    animation: fadeInUp 0.8s ease 0.4s both;
   }
 
   .hero p {
-    font-size: clamp(1rem, 2vw, 1.3rem);
+    font-size: clamp(0.9rem, 1.5vw, 1.15rem);
     color: var(--text-muted);
-    max-width: 600px;
-    line-height: 1.7;
+    max-width: 620px;
+    line-height: 1.8;
     margin-bottom: 2.5rem;
-    animation: fadeInUp 0.8s ease 0.4s both;
+    animation: fadeInUp 0.8s ease 0.5s both;
+    letter-spacing: 0.02em;
   }
 
   .hero-actions {
@@ -121,18 +202,18 @@
     gap: 1rem;
     flex-wrap: wrap;
     justify-content: center;
-    animation: fadeInUp 0.8s ease 0.6s both;
+    animation: fadeInUp 0.8s ease 0.7s both;
   }
 
   .btn {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.6rem;
     padding: 1rem 2rem;
     border-radius: 100px;
     font-family: 'Space Grotesk', sans-serif;
     font-weight: 600;
-    font-size: 1rem;
+    font-size: 0.95rem;
     text-decoration: none;
     transition: all 0.3s ease;
     cursor: pointer;
@@ -141,11 +222,11 @@
   .btn-primary {
     background: linear-gradient(135deg, var(--accent), var(--accent2));
     color: #fff;
-    box-shadow: var(--glow);
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.3), 0 0 60px rgba(0, 212, 255, 0.1);
   }
   .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 30px rgba(0, 212, 255, 0.5), 0 0 80px rgba(0, 212, 255, 0.2);
+    transform: translateY(-3px);
+    box-shadow: 0 0 40px rgba(0, 212, 255, 0.5), 0 0 80px rgba(0, 212, 255, 0.2);
   }
   .btn-secondary {
     background: rgba(255,255,255,0.05);
@@ -155,40 +236,42 @@
   .btn-secondary:hover {
     background: rgba(255,255,255,0.1);
     border-color: var(--accent);
-    transform: translateY(-2px);
+    transform: translateY(-3px);
   }
   .btn-whatsapp {
     background: #25d366;
     color: #fff;
+    box-shadow: 0 0 15px rgba(37, 211, 102, 0.2);
   }
   .btn-whatsapp:hover {
     background: #20bd5a;
-    transform: translateY(-2px);
+    transform: translateY(-3px);
     box-shadow: 0 0 30px rgba(37, 211, 102, 0.4);
   }
 
   .terminal-box {
     margin-top: 3rem;
     padding: 1.2rem 1.5rem;
-    background: rgba(0,0,0,0.5);
-    border: 1px solid rgba(0, 212, 255, 0.15);
+    background: rgba(0,0,0,0.6);
+    border: 1px solid rgba(0, 212, 255, 0.12);
     border-radius: var(--radius);
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     color: var(--accent);
-    max-width: 500px;
+    max-width: 520px;
     width: 100%;
     text-align: left;
-    animation: fadeInUp 0.8s ease 0.8s both;
+    animation: fadeInUp 0.8s ease 1s both;
     position: relative;
     overflow: hidden;
+    backdrop-filter: blur(8px);
   }
   .terminal-box::before {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0;
     height: 1px;
-    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent);
     animation: scanLine 3s linear infinite;
   }
   .terminal-box .line {
@@ -197,9 +280,12 @@
     opacity: 0;
     animation: typeIn 0.5s ease forwards;
   }
-  .terminal-box .line:nth-child(1) { animation-delay: 1s; }
-  .terminal-box .line:nth-child(2) { animation-delay: 1.8s; }
-  .terminal-box .line:nth-child(3) { animation-delay: 2.6s; }
+  .terminal-box .line:nth-child(1) { animation-delay: 1.2s; }
+  .terminal-box .line:nth-child(2) { animation-delay: 2s; }
+  .terminal-box .line:nth-child(3) { animation-delay: 2.8s; }
+  .terminal-box .prefix {
+    color: var(--accent2);
+  }
   .terminal-box .prompt { color: var(--text-muted); }
   .terminal-box .cursor {
     display: inline-block;
@@ -220,8 +306,11 @@
   }
   .features h2 {
     text-align: center;
-    font-size: clamp(1.8rem, 4vw, 2.5rem);
-    margin-bottom: 1rem;
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.8rem;
     background: linear-gradient(135deg, var(--accent), var(--accent2));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -231,6 +320,7 @@
     text-align: center;
     color: var(--text-muted);
     margin-bottom: 3rem;
+    font-size: 0.95rem;
   }
   .features-grid {
     display: grid;
@@ -264,10 +354,8 @@
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
   }
 
-  /* ── Custom SVG Icon Container ── */
   .feature-card .icon-wrap {
-    width: 48px;
-    height: 48px;
+    width: 48px; height: 48px;
     margin-bottom: 1rem;
     display: flex;
     align-items: center;
@@ -282,8 +370,7 @@
     border-color: rgba(0, 212, 255, 0.25);
   }
   .feature-card .icon-wrap svg {
-    width: 24px;
-    height: 24px;
+    width: 24px; height: 24px;
     fill: none;
     stroke: var(--accent);
     stroke-width: 1.8;
@@ -296,12 +383,14 @@
   }
 
   .feature-card h3 {
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     margin-bottom: 0.5rem;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
   }
   .feature-card p {
     color: var(--text-muted);
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     line-height: 1.6;
   }
 
@@ -312,9 +401,17 @@
     text-align: center;
   }
   .contact h2 {
-    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
     margin-bottom: 1rem;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
+
   .contact p {
     color: var(--text-muted);
     margin-bottom: 2rem;
@@ -337,13 +434,11 @@
     transform: translateY(-2px);
   }
   .contact-card .wa-svg {
-    width: 44px;
-    height: 44px;
+    width: 44px; height: 44px;
     flex-shrink: 0;
   }
   .contact-card .wa-svg svg {
-    width: 100%;
-    height: 100%;
+    width: 100%; height: 100%;
     fill: none;
     stroke: #25d366;
     stroke-width: 2;
@@ -354,10 +449,11 @@
     text-align: left;
   }
   .contact-card .wa-info .label {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: var(--text-muted);
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.15em;
+    font-family: 'Orbitron', sans-serif;
   }
   .contact-card .wa-info .number {
     font-size: 1.3rem;
@@ -371,10 +467,14 @@
     text-align: center;
     padding: 2rem;
     color: var(--text-muted);
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     border-top: 1px solid rgba(255,255,255,0.03);
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
   }
 
+  /* ── KEYFRAMES ── */
   @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(30px); }
     to { opacity: 1; transform: translateY(0); }
@@ -398,6 +498,24 @@
     from { opacity: 0; transform: translateX(-10px); }
     to { opacity: 1; transform: translateX(0); }
   }
+  @keyframes glowPulse {
+    0%, 100% {
+      filter: drop-shadow(0 0 15px rgba(0, 212, 255, 0.3)) drop-shadow(0 0 40px rgba(124, 58, 237, 0.1));
+    }
+    50% {
+      filter: drop-shadow(0 0 30px rgba(0, 212, 255, 0.6)) drop-shadow(0 0 80px rgba(124, 58, 237, 0.3));
+    }
+  }
+  @keyframes brandFloat {
+    0%, 100% {
+      transform: translateY(0);
+      filter: drop-shadow(0 0 40px rgba(0, 212, 255, 0.4)) drop-shadow(0 0 80px rgba(124, 58, 237, 0.2));
+    }
+    50% {
+      transform: translateY(-8px);
+      filter: drop-shadow(0 0 60px rgba(0, 212, 255, 0.7)) drop-shadow(0 0 120px rgba(124, 58, 237, 0.4));
+    }
+  }
 
   @media (max-width: 600px) {
     .hero-actions { flex-direction: column; align-items: center; }
@@ -405,6 +523,7 @@
     .features-grid { grid-template-columns: 1fr; }
     .contact-card { flex-direction: column; text-align: center; }
     .contact-card .wa-info { text-align: center; }
+    .hero .line-outline { -webkit-text-stroke: 1px var(--text); }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -422,41 +541,46 @@
 <section class="hero">
   <div class="hero-badge">
     <span class="dot"></span>
-    Online · Inteligência Artificial
+    <span>Online</span>
+    <span class="divider"></span>
+    <span>Inteligência Artificial</span>
   </div>
 
   <h1>
-    <span class="outline">Fala, família!</span><br>
-    <span class="gradient">Aqui é o Sam</span>
+    <span class="line-outline">OFERTAS</span>
+    <span class="line-gradient" data-text="COM INTELIGÊNCIA">COM INTELIGÊNCIA</span>
+    <span class="line-brand" data-text="SAM">SAM</span>
   </h1>
 
+  <div class="hero-divider"></div>
+
   <p>
-    Seu parceiro inteligente que caça as melhores ofertas, responde na hora 
-    e ainda troca uma ideia com você — tudo pelo WhatsApp.
+    Inteligência Artificial que encontra as melhores ofertas de Amazon, 
+    Mercado Livre e Shopee — e entrega tudo direto no seu WhatsApp.
   </p>
 
   <div class="hero-actions">
     <a href="https://wa.me/558599792167" target="_blank" class="btn btn-whatsapp">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-      Falar com Sam
+      Falar com Sam no WhatsApp
     </a>
     <a href="https://solutionaiduckdns-cell.github.io/sam-assistente/sam.html" target="_blank" class="btn btn-secondary">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-      Versão Web
+      Conversar na Web
     </a>
   </div>
 
   <div class="terminal-box">
-    <div class="line"><span class="prompt">$</span> sam<span class="cursor"></span></div>
-    <div class="line"><span class="prompt">></span> Inicializando módulos neurais...</div>
-    <div class="line"><span class="prompt">></span> Sistema pronto. Aguardando comando.</div>
+    <div class="line"><span class="prefix">◆</span> <span class="prompt">$</span> sam<span class="cursor"></span></div>
+    <div class="line"><span class="prefix">◆</span> Inicializando módulos neurais...</div>
+    <div class="line"><span class="prefix">◆</span> <span style="color:var(--accent2);">SAM</span> — Sistema online. Aguardando comando.</div>
   </div>
 </section>
 
 <!-- FEATURES -->
 <section class="features">
-  <h2>O que o Sam faz</h2>
-  <p class="subtitle">Na prática, é isso aqui que ele entrega</p>
+  <h2>Capacidades</h2>
+  <p class="subtitle">O que o Sam entrega na prática</p>
   <div class="features-grid">
 
     <div class="feature-card">
@@ -495,7 +619,7 @@
       <div class="icon-wrap">
         <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
       </div>
-      <h3>Recomendações na Mosca</h3>
+      <h3>Na Mosca</h3>
       <p>Entende o que você procura e manda as ofertas certas, no momento certo.</p>
     </div>
 
@@ -504,7 +628,7 @@
         <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       </div>
       <h3>24 Horas na Área</h3>
-      <p>Dia, noite, madrugada, feriado — Sam tá on. Só chamar.</p>
+      <p>Dia, noite, madrugada, feriado — Sam tá on. É só chamar.</p>
     </div>
 
   </div>
@@ -512,7 +636,7 @@
 
 <!-- CONTACT -->
 <section class="contact" id="contato">
-  <h2>Bora conversar?</h2>
+  <h2>Bora Conversar?</h2>
   <p>Chama o Sam no WhatsApp que ele responde na hora</p>
   <a href="https://wa.me/558599792167" target="_blank" class="contact-card">
     <div class="wa-svg">
@@ -527,7 +651,7 @@
 </section>
 
 <footer>
-  <p>Sam — Feito por humanos, turbinado por IA &bull; 2026</p>
+  <p>Sam &bull; Feito por humanos, turbinado por IA &bull; 2026</p>
 </footer>
 
 <script>
